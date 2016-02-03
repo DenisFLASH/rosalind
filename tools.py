@@ -31,8 +31,8 @@ def read_fasta_file(path):
     if path.startswith('http://'):
         req = urllib.request.Request(path, headers={'User-Agent': 'Mozilla/5.0'})
         with urllib.request.urlopen(req) as response:
-            html = str(response.read())
-        #lines = 
+            html = response.read().decode('utf-8')
+            lines = html.split('\n')
     else:
         lines = read_local_file(path)
     return parse_fasta_lines(lines)
@@ -66,7 +66,6 @@ def parse_fasta_lines(lines):
     it is recommended that all lines of text are shorter than 80 symbols. 
     The string ends when another line starting with '>' appears, 
     indicating the start of another sequence (or if the end of the file is reached).
-    
     
     Args:
         + lines (list of str): lines representing content of a file
@@ -116,13 +115,13 @@ def punnett_square(factor1, factor2):
 
 
 
-def find_indices_of_matches(s, t):
+def find_indices_of_matches(s, pattern):
     """
     Find all appearances of a substirng in a string.
     
     Args:
         + s (str): initial string
-        + t (str): substring to look for in the initial string
+        + pattern (str): pattern of a substring to look for in the initial string. Can use regex syntax.
        
     Returns:
         + (list of int): list of starting positions of subsring in the initial string 
@@ -132,8 +131,7 @@ def find_indices_of_matches(s, t):
     """
     starting_positions = list()
     # regex pattern including lookahead assertion (?=...)
-    pattern = r'(?=({0})).'.format(t)
-    matches = re.finditer(pattern, s)
+    matches = re.finditer(r'(?=({0})).'.format(pattern), s)
     for match in matches:
         # Add 1 to get 1-based positions
         #print(match.start() + 1, match.group(1), end=', ')
