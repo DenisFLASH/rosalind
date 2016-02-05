@@ -1,6 +1,6 @@
 import re
 import urllib.request
-
+from lookup import rna_codon_to_amino_acid
 
 
 def read_local_file(path):
@@ -20,7 +20,6 @@ def read_local_file(path):
     return lines
 
 
-
 def read_fasta_file(path):
     """
     Read FASTA file given its path.
@@ -36,7 +35,6 @@ def read_fasta_file(path):
     else:
         lines = read_local_file(path)
     return parse_fasta_lines(lines)
-
 
 
 def parse_fasta_lines(lines):
@@ -92,7 +90,6 @@ def parse_fasta_lines(lines):
     return d
 
 
-
 def punnett_square(factor1, factor2):
     """
     Args:
@@ -114,14 +111,14 @@ def punnett_square(factor1, factor2):
     return outcome_probs
 
 
-
-def find_indices_of_matches(s, pattern):
+def find_indices_of_matches(s, pattern, base=1):
     """
-    Find all appearances of a substirng in a string.
+    Find all appearances of a substirng in a string. Starting positions
     
     Args:
         + s (str): initial string
         + pattern (str): pattern of a substring to look for in the initial string. Can use regex syntax.
+        + base (int): whether indices of found substring are expressed in base 0 or base 1
        
     Returns:
         + (list of int): list of starting positions of subsring in the initial string 
@@ -135,5 +132,41 @@ def find_indices_of_matches(s, pattern):
     for match in matches:
         # Add 1 to get 1-based positions
         #print(match.start() + 1, match.group(1), end=', ')
-        starting_positions.append(match.start() + 1)
+        starting_positions.append(match.start() + base)
     return starting_positions
+
+
+def transcribe_DNA_to_RNA(dna_string):
+    """
+    Transcribe DNA string to RNA string.
+    """
+    return dna_string.replace('T', 'U')
+
+
+def translate_rna_into_protein(rna_string):
+    """
+    Translate RNA string into a proteing string.
+    """
+    if len(rna_string) % 3 != 0:
+        raise Exception("Length of RNA string is not a factor of 3, and thus cannot be translated into protein string.")
+    protein = ''
+    for start in range(0, len(rna_string), 3):
+        codon = rna_string[start:start+3]
+        amino_acid = rna_codon_to_amino_acid[codon]
+        if amino_acid == 'Stop':
+            break
+        protein += amino_acid
+    return protein 
+
+
+def reverse_complement(s):
+    complement = {'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A'}
+    return ''.join([complement[base] for base in s[::-1]])
+
+
+# Not used yet
+def loop_string(s, start_pos):
+    """
+    From a given string, make another string by "closing a string in a loop", starting from a given position.
+    """
+    return s[start_pos:] + s[:start_pos]
