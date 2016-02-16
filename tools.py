@@ -143,12 +143,14 @@ def transcribe_DNA_to_RNA(dna_string):
     return dna_string.replace('T', 'U')
 
 
-def translate_rna_into_protein(rna_string):
+def translate_RNA_into_protein(rna_string):
     """
     Translate RNA string into a proteing string.
     """
     if len(rna_string) % 3 != 0:
-        raise Exception("Length of RNA string is not a factor of 3, and thus cannot be translated into protein string.")
+        raise Exception("Length of RNA string is {0}, not a factor of 3, and thus cannot be translated into protein string."\
+                        .format(str(len(rna_string))))
+    rna_string = rna_string.upper()  
     protein = ''
     for start in range(0, len(rna_string), 3):
         codon = rna_string[start:start+3]
